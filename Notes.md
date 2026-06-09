@@ -117,6 +117,58 @@ Real exchanges get more cancellations than executions.
 
 ## Trade Price  
 
+### Suppose  
+> Resting Sell @ 100  
+> Incoming Buy @ 105  
+> Trade happens at 100  
+
+First, let's examine the situation. Some trader is willing to sell for 100, and someone is willing to buy for 105.  
+  
+The trade happens at 100 and not 105, since the resting order arrived first and established the price. This is standard exchange behavior.
+
+## Data Structures Needed  
+
+### Bids  
+> Need highest price quickly  
+
+### Asks  
+> Need lowest price quickly  
+
+### Orders at Same Price  
+> Need FIFO ordering  
+
+Data structures most likely needed: Heaps, queues/deques, hash maps  
+
+## Complexity Considerations  
+### Questions  
+> Add order complexity?  
+> Cancel order complexity?  
+> Find best bid complexity?  
+> Find best ask complexity?  
+
+## What Real Exchanges Care About  
+
+This project likely won't be as complex, but it's useful to know.  
+
+### Latency  
+> How long to process an order?  
+> Measured in microseconds or nanoseconds  
+
+### Throughput  
+> How many orders per second?  
+> Ex: 10 million order/sec  
+
+### Memory  
+> Can the book hold millions of orders?  
+
+### Cache Efficiency  
+> Avoid unnecessary memory access  
+> Important in high-frequency trading  
+
+
+
+
+
 
 
 
