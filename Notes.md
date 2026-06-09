@@ -165,7 +165,33 @@ This project likely won't be as complex, but it's useful to know.
 > Avoid unnecessary memory access  
 > Important in high-frequency trading  
 
+## **Version 1 of Project**  
 
+### Order Types  
+> Limit Buy  
+> Limit Sell  
+
+### Operations  
+> Add Order  
+> Cancel Order  
+> Match Orders  
+
+### Features  
+> Price-Time Priority  
+> Partial Fills  
+> Trade Reporting  
+> Best Bid/Ask  
+
+## Features To Add Later  
+
+### Market Simulator  
+> Generate random traders to make the exchange run continuously  
+
+### Market-Making Bot  
+> Make a strategy  
+
+### Use Real Trade Data  
+> Put real data into the engine
 
 
 
