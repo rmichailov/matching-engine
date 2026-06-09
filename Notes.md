@@ -181,6 +181,7 @@ This project likely won't be as complex, but it's useful to know.
 > Partial Fills  
 > Trade Reporting  
 > Best Bid/Ask  
+> Print order book
 
 ## Features To Add Later  
 
