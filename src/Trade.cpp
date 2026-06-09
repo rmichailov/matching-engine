@@ -4,17 +4,17 @@ Trade::Trade(int buyId, int sellId, double price, double quantity) : buyId(buyId
 
 }
 
-int Trade::getBuyId() {
+int Trade::getBuyId() const{
     return buyId;
 }
-int Trade::getSellId() {
+int Trade::getSellId() const {
     return sellId;
 }
 
-double Trade::getPrice() {
+double Trade::getPrice() const {
     return price;
 }
 
-double Trade::getQuantity() {
+double Trade::getQuantity() const {
     return quantity;
 }

@@ -9,8 +9,8 @@ class Trade {
     
     public:
         Trade(int buyId, int sellId, double price, double quantity);
-        int getBuyId();
-        int getSellId();
-        double getPrice();
-        double getQuantity();
+        int getBuyId() const;
+        int getSellId() const;
+        double getPrice() const;
+        double getQuantity() const;
 };
