@@ -12,7 +12,17 @@ bool OrderBook::isEmpty() const {
     return orderLookup.size() == 0;
 }
 
-void addOrder(Order* ord);
+void OrderBook::addOrder(Order* ord) {
+    orderLookup[ord->getId()] = ord;
+
+    if (ord->getSide() == Side::Buy) {
+        buyOrders[ord->getPrice()].push(ord);
+    }
+    else {
+        sellOrders[ord->getPrice()].push(ord);
+    }
+}
+
 void cancelOrder(int id);
 void matchOrder(Order* ord);
 
@@ -73,5 +83,6 @@ void OrderBook::printAsks() const {
             q.pop();
         }
     }
+    std::cout << std::endl;
 }
 Order* getOrderByID(int id);        
