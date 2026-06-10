@@ -100,7 +100,7 @@ void OrderBook::printAsks() const {
     std::cout << "\n";
 }
 
-Order* OrderBook::getOrderByID(int id) {
+Order* OrderBook::getOrderById(int id) {
     if (orderLookup.find(id) != orderLookup.end()) {
         return orderLookup[id];
     }

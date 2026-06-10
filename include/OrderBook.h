@@ -32,6 +32,6 @@ class OrderBook {
         void printBook() const;
         void printBids() const;
         void printAsks() const;
-        Order* getOrderByID(int id);        
+        Order* getOrderById(int id);        
 
 };
