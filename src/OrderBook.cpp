@@ -40,16 +40,6 @@ double OrderBook::getBestAsk() const {
     return sellOrders.begin()->first;
 }
 
-void OrderBook::printBook() const {
-    for (const auto& entry : buyOrders) {
-
-    }
-}
-void OrderBook::printBids() const {
-    for (const auto& entry : buyOrders) {
-        
-    }
-}
 
 /*
 SELLS
@@ -71,6 +61,29 @@ Price: 100.00
 
 Price: 99.75
     ID=8 Qty=20*/
+
+void OrderBook::printBook() const {
+    printBids();
+    std::cout << "\n";
+    printAsks();
+}
+void OrderBook::printBids() const {
+    std::cout << "BUYS\n\n";
+    for (auto it = buyOrders.rbegin(); it != buyOrders.rend(); ++it)
+    {
+        std::cout << "Price: " << it->first << "\n";
+        auto q = it->second;
+        while (!q.empty()) {
+            Order* ord = q.front();
+
+            std::cout << "  ID = " << ord->getId() << " Qty = " << ord->getQuantity() << "\n";
+            q.pop();
+        }
+        std::cout << "\n";
+    }
+    std::cout << "\n";
+}
+
 void OrderBook::printAsks() const {
     std::cout << "SELLS\n\n";
     for (const auto& entry : sellOrders) {
@@ -82,7 +95,8 @@ void OrderBook::printAsks() const {
             std::cout << "  ID = " << ord->getId() << " Qty = " << ord->getQuantity() << "\n";
             q.pop();
         }
+        std::cout << "\n";
     }
-    std::cout << std::endl;
+    std::cout << "\n";
 }
 Order* getOrderByID(int id);        

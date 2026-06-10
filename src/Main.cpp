@@ -11,7 +11,20 @@ int main() {
     book.addOrder(&s2);
     book.addOrder(&s3);
 
-    book.printAsks();
+    Order b1(1, Side::Buy, 100.0, 10, 1);
+    Order b2(2, Side::Buy, 101.0, 20, 2);
+    Order b3(3, Side::Buy, 100.0, 30, 3);
+    Order b4(4, Side::Buy, 102.0, 40, 4);
+    Order b5(5, Side::Buy, 101.0, 50, 5);
+
+    book.addOrder(&b1);
+    book.addOrder(&b2);
+    book.addOrder(&b3);
+    book.addOrder(&b4);
+    book.addOrder(&b5);
+
+    book.printBids();    
+    // book.printAsks();
 
     return 0;
 }
