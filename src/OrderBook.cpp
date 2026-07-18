@@ -5,10 +5,18 @@
 // can match with opposite side
 bool OrderBook::hasMatch(const Order& ord) {
     if (ord.getSide() == Side::Buy) {
-        return (getBestAsk() != -1) ? ord.getPrice() >= getBestAsk() : false;
+        double ask = getBestAsk();
+        if (ask == -1) {
+            return false;
+        }
+        return ord.getPrice() >= ask;
     }
     else {
-        return (getBestBid() != -1) ? ord.getPrice() <= getBestBid() : false;;
+        double bid = getBestBid();
+        if (bid == -1) {
+            return false;
+        }
+        return ord.getPrice() <= bid;
     }
 }
 
