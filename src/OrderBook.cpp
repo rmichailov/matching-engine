@@ -1,8 +1,16 @@
 #include "OrderBook.h"
 #include <iostream>
-    // Checks whether an incoming order
-    // can match with opposite side
-bool hasMatch(const Order& ord); 
+
+// Checks whether an incoming order
+// can match with opposite side
+bool OrderBook::hasMatch(const Order& ord) {
+    if (ord.getSide() == Side::Buy) {
+        return (getBestAsk() != -1) ? ord.getPrice() >= getBestAsk() : false;
+    }
+    else {
+        return (getBestBid() != -1) ? ord.getPrice() <= getBestBid() : false;;
+    }
+}
 
 // Removes orders whose quantity has reached 0
 void removeFilledOrders();
