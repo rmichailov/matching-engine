@@ -125,7 +125,9 @@ bool OrderBook::cancelOrder(int id) {
     return true;
 }
 
-void matchOrder(Order* ord);
+std::vector<Trade> OrderBook::matchOrder(Order* ord) {
+
+}
 
 double OrderBook::getBestBid() const {
     if (buyOrders.empty()) {

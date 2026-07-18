@@ -20,4 +20,5 @@ class Order {
         double getPrice() const;
         double getQuantity() const;
         int getTime() const;      
+        bool reduceQuantity(double amount);
 };

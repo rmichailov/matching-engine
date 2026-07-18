@@ -27,3 +27,11 @@ double Order::getQuantity() const {
 int Order::getTime() const {
     return timestamp;
 }
+
+bool Order::reduceQuantity(double amount) {
+    if (amount < 0 || amount > quantity) {
+        return false;
+    }
+    quantity -= amount;
+    return true;
+}
