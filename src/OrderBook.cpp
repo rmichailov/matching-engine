@@ -21,7 +21,35 @@ bool OrderBook::hasMatch(const Order& ord) {
 }
 
 // Removes orders whose quantity has reached 0
-void removeFilledOrders();
+void OrderBook::removeFilledOrders() {
+    if (!buyOrders.empty()) {
+        auto it = std::prev(buyOrders.end());
+        std::queue<Order*>& orders = it->second;
+
+        if (orders.front()->getQuantity() <= 0) {
+            orderLookup.erase(orders.front()->getId());
+            orders.pop();
+
+            if (orders.empty()) {
+                buyOrders.erase(it);
+            }
+        }
+    }
+
+    if (!sellOrders.empty()) {
+        auto it = sellOrders.begin();
+        std::queue<Order*>& orders = it->second;
+
+        if (orders.front()->getQuantity() <= 0) {
+            orderLookup.erase(orders.front()->getId());
+            orders.pop();
+
+            if (orders.empty()) {
+                sellOrders.erase(it);
+            }
+        }
+    }
+}
 
 // Checks whether the book has no active orders
 bool OrderBook::isEmpty() const {
