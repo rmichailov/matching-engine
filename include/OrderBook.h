@@ -24,7 +24,7 @@ class OrderBook {
 
     public:
         void addOrder(Order* ord);
-        void cancelOrder(int id);
+        bool cancelOrder(int id);
         void matchOrder(Order* ord);
         double getBestBid() const;
         double getBestAsk() const;

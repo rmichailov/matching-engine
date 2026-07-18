@@ -1,5 +1,6 @@
 #include "OrderBook.h"
 #include <iostream>
+#include <utility>
 
 // Checks whether an incoming order
 // can match with opposite side
@@ -67,7 +68,63 @@ void OrderBook::addOrder(Order* ord) {
     }
 }
 
-void cancelOrder(int id);
+bool OrderBook::cancelOrder(int id) {
+    auto it = orderLookup.find(id);
+    if (it == orderLookup.end()) {
+        return false;
+    }
+    Order* ord = it->second;
+    if (ord->getSide() == Side::Buy) {
+        auto priceIt = buyOrders.find(ord->getPrice());
+
+        if (priceIt == buyOrders.end()) {
+            return false;
+        }
+
+        std::queue<Order*>& orders = priceIt->second;
+        std::queue<Order*> remaining;
+        
+        while (!orders.empty()) {
+            Order* current = orders.front();
+            if (current->getId() != id) {
+                remaining.push(current);
+            }
+            orders.pop();
+        }
+
+        orders = std::move(remaining);
+        if (orders.empty()) {
+            buyOrders.erase(priceIt);
+        }
+    }
+    else {
+        auto priceIt = sellOrders.find(ord->getPrice());
+
+        if (priceIt == sellOrders.end()) {
+            return false;
+        }
+
+        std::queue<Order*>& orders = priceIt->second;
+        std::queue<Order*> remaining;
+        
+        while (!orders.empty()) {
+            Order* current = orders.front();
+            if (current->getId() != id) {
+                remaining.push(current);
+            }
+            orders.pop();
+        }
+
+        orders = std::move(remaining);
+        if (orders.empty()) {
+            sellOrders.erase(priceIt);
+        }
+    }
+
+    orderLookup.erase(it);
+    return true;
+}
+
 void matchOrder(Order* ord);
 
 double OrderBook::getBestBid() const {
