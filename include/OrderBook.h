@@ -1,5 +1,6 @@
 #pragma once
 #include "Order.h"
+#include "Trade.h"
 #include <unordered_map>
 #include <map>
 #include <queue>
@@ -25,7 +26,7 @@ class OrderBook {
     public:
         void addOrder(Order* ord);
         bool cancelOrder(int id);
-        void matchOrder(Order* ord);
+        std::vector<Trade> matchOrder(Order* ord);
         double getBestBid() const;
         double getBestAsk() const;
 

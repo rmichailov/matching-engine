@@ -1,6 +1,7 @@
 #include "OrderBook.h"
 #include <iostream>
 #include <utility>
+#include <algorithm>
 
 // Checks whether an incoming order
 // can match with opposite side
@@ -126,7 +127,37 @@ bool OrderBook::cancelOrder(int id) {
 }
 
 std::vector<Trade> OrderBook::matchOrder(Order* ord) {
+    std::vector<Trade> trades;
 
+    while (ord->getQuantity() > 0 && hasMatch(*ord)) {
+        if (ord->getSide() == Side::Buy) {
+            auto priceIt = sellOrders.begin();
+            Order* resting = priceIt->second.front();
+
+            double matchedQ = std::min(ord->getQuantity(), resting->getQuantity());
+            ord->reduceQuantity(matchedQ);
+            resting->reduceQuantity(matchedQ);
+
+            trades.emplace_back(ord->getId(), resting->getId(), resting->getPrice(), matchedQ);
+            removeFilledOrders();
+        }
+        else {
+            auto priceIt = std::prev(buyOrders.end());
+            Order* resting = priceIt->second.front();
+
+            double matchedQ = std::min(ord->getQuantity(), resting->getQuantity());
+            ord->reduceQuantity(matchedQ);
+            resting->reduceQuantity(matchedQ);
+
+            trades.emplace_back(resting->getId(), ord->getId(), resting->getPrice(), matchedQ);
+            removeFilledOrders();            
+        }
+    }
+    
+    if (ord->getQuantity() > 0) {
+        addOrder(ord);
+    }
+    return trades;
 }
 
 double OrderBook::getBestBid() const {
