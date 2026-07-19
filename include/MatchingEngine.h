@@ -11,4 +11,4 @@ class MatchinEngine {
         std::vector<Trade> submitOrder(Order* ord);
         bool cancelOrder(int id);
         const OrderBook& getOrderBook() const;
-}
+};
