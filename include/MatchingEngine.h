@@ -3,7 +3,7 @@
 #include "OrderBook.h"
 #include <vector>
 
-class MatchinEngine {
+class MatchingEngine {
     private:
         OrderBook orderBook;
     
