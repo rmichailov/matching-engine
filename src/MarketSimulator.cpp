@@ -64,3 +64,42 @@ Order* MarketSimulator::generateRandomOrder() {
 
     return orderPointer;
 }
+
+
+SimulationResults MarketSimulator::run(std::size_t numberOfOrders)
+{
+    std::size_t tradeCount = 0;
+
+    orders.reserve(orders.size() + numberOfOrders);
+
+    auto startTime = std::chrono::steady_clock::now();
+
+    for (std::size_t i = 0; i < numberOfOrders; i++) {
+        Order* order = generateRandomOrder();
+        std::vector<Trade> trades = engine.submitOrder(order);
+        tradeCount += trades.size();
+    }
+
+    auto endTime = std::chrono::steady_clock::now();
+
+    std::chrono::duration<double> elapsedTime = endTime - startTime;
+
+    double runtimeSeconds = elapsedTime.count();
+
+    double ordersPerSecond =
+        runtimeSeconds > 0.0
+            ? static_cast<double>(numberOfOrders) / runtimeSeconds
+            : 0.0;
+
+    return SimulationResults{
+        numberOfOrders,
+        tradeCount,
+        runtimeSeconds,
+        ordersPerSecond
+    };
+}
+
+const MatchingEngine& MarketSimulator::getEngine() const
+{
+    return engine;
+}
