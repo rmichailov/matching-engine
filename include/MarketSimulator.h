@@ -17,33 +17,26 @@ struct SimulationResults
 
 class MarketSimulator
 {
-private:
-    MatchingEngine engine;
+    private:
+        MatchingEngine engine;
 
-    std::vector<std::unique_ptr<Order>> orders;
+        std::vector<std::unique_ptr<Order>> orders;
 
-    std::mt19937 randomGenerator;
+        std::mt19937 randomGenerator;
 
-    int nextOrderId;
-    int nextTimestamp;
+        int nextOrderId;
+        int nextTimestamp;
 
-    double basePrice;
-    double priceRange;
-    double minimumQuantity;
-    double maximumQuantity;
+        double basePrice;
+        double priceRange;
+        double minimumQuantity;
+        double maximumQuantity;
 
-    Order* generateRandomOrder();
+        Order* generateRandomOrder();
 
-public:
-    MarketSimulator(
-        unsigned int seed,
-        double basePrice,
-        double priceRange,
-        double minimumQuantity,
-        double maximumQuantity
-    );
-
-    SimulationResults run(std::size_t numberOfOrders);
-
-    const MatchingEngine& getEngine() const;
+    public:
+        MarketSimulator(unsigned int seed, double basePrice, double priceRange, double minimumQuantity, double maximumQuantity);
+        
+        SimulationResults run(std::size_t numberOfOrders);
+        const MatchingEngine& getEngine() const;
 };
