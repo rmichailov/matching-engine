@@ -1,27 +1,39 @@
-#include "MatchingEngine.h"
+#include "MarketSimulator.h"
 
+#include <iomanip>
 #include <iostream>
 
-int main() {
-    MatchingEngine engine;
+int main()
+{
+    const std::size_t numberOfOrders = 1'000'000;
 
-    Order sell(1, Side::Sell, 100.0, 10.0, 1);
-    Order buy(2, Side::Buy, 101.0, 6.0, 2);
+    MarketSimulator simulator(
+        42,       // Random seed
+        100.00,   // Base price
+        2.00,     // Prices range from 98 to 102
+        1.00,     // Minimum quantity
+        100.00    // Maximum quantity
+    );
 
-    engine.submitOrder(&sell);
+    SimulationResults results = simulator.run(numberOfOrders);
 
-    std::vector<Trade> trades = engine.submitOrder(&buy);
+    std::cout << std::fixed << std::setprecision(3);
 
-    for (const Trade& trade : trades) {
-        std::cout
-            << "Trade: Buy ID " << trade.getBuyId()
-            << ", Sell ID " << trade.getSellId()
-            << ", Price " << trade.getPrice()
-            << ", Quantity " << trade.getQuantity()
-            << '\n';
-    }
+    std::cout << "\nSimulation Results\n";
+    std::cout << "------------------\n";
+    std::cout << "Orders processed: "
+              << results.ordersProcessed << '\n';
 
-    engine.getOrderBook().printBook();
+    std::cout << "Trades executed:  "
+              << results.tradesExecuted << '\n';
+
+    std::cout << "Runtime:          "
+              << results.runtimeSeconds
+              << " seconds\n";
+
+    std::cout << "Throughput:       "
+              << results.ordersPerSecond
+              << " orders/second\n";
 
     return 0;
 }
