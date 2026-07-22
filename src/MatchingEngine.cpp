@@ -1,7 +1,7 @@
 #include "MatchingEngine.h"
 
-std::vector<Trade> MatchingEngine::submitOrder(Order* ord) {
-    return orderBook.matchOrder(ord);
+void MatchingEngine::submitOrder(Order* ord, std::vector<Trade>& trades) {
+    orderBook.matchOrder(ord, trades);
 }
 
 bool MatchingEngine::cancelOrder(int id) {

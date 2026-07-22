@@ -8,7 +8,7 @@ class MatchingEngine {
         OrderBook orderBook;
     
     public:
-        std::vector<Trade> submitOrder(Order* ord);
+        void submitOrder(Order* ord, std::vector<Trade>& trades);
         bool cancelOrder(int id);
         const OrderBook& getOrderBook() const;
 };

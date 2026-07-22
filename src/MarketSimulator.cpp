@@ -99,11 +99,15 @@ double MarketSimulator::calculatePercentile(std::vector<double>& latencies, doub
 SimulationResults MarketSimulator::runThroughputBenchmark() {
     std::size_t tradeCount = 0;
 
+    std::vector<Trade> trades;
+    trades.reserve(16);
+
     auto benchmarkStart = std::chrono::steady_clock::now();
 
-    for (const std::unique_ptr<Order>& order : orders)
-    {
-        std::vector<Trade> trades = engine.submitOrder(order.get());
+    for (const std::unique_ptr<Order>& order : orders) {
+        trades.clear();
+
+        engine.submitOrder(order.get(), trades);
 
         tradeCount += trades.size();
     }
@@ -117,8 +121,7 @@ SimulationResults MarketSimulator::runThroughputBenchmark() {
 
     double ordersPerSecond = 0.0;
 
-    if (runtimeSeconds > 0.0)
-    {
+    if (runtimeSeconds > 0.0) {
         ordersPerSecond =
             static_cast<double>(orders.size()) / runtimeSeconds;
     }
@@ -136,20 +139,23 @@ SimulationResults MarketSimulator::runThroughputBenchmark() {
     };
 }
 
-SimulationResults MarketSimulator::runLatencyBenchmark()
-{
+SimulationResults MarketSimulator::runLatencyBenchmark() {
     std::size_t tradeCount = 0;
 
     std::vector<double> latencies;
     latencies.reserve(orders.size());
 
+    std::vector<Trade> trades;
+    trades.reserve(16);
+
     auto benchmarkStart = std::chrono::steady_clock::now();
 
-    for (const std::unique_ptr<Order>& order : orders)
-    {
+    for (const std::unique_ptr<Order>& order : orders) {
+        trades.clear();
+
         auto orderStart = std::chrono::steady_clock::now();
 
-        std::vector<Trade> trades = engine.submitOrder(order.get());
+        engine.submitOrder(order.get(), trades);
 
         auto orderEnd = std::chrono::steady_clock::now();
 
@@ -170,8 +176,7 @@ SimulationResults MarketSimulator::runLatencyBenchmark()
 
     double ordersPerSecond = 0.0;
 
-    if (runtimeSeconds > 0.0)
-    {
+    if (runtimeSeconds > 0.0) {
         ordersPerSecond =
             static_cast<double>(orders.size()) / runtimeSeconds;
     }
@@ -184,8 +189,7 @@ SimulationResults MarketSimulator::runLatencyBenchmark()
 
     double averageLatency = 0.0;
 
-    if (!latencies.empty())
-    {
+    if (!latencies.empty()) {
         averageLatency =
             totalLatency / static_cast<double>(latencies.size());
     }
@@ -203,8 +207,7 @@ SimulationResults MarketSimulator::runLatencyBenchmark()
 
     double maximumLatency = 0.0;
 
-    if (!latencies.empty())
-    {
+    if (!latencies.empty()) {
         maximumLatency = latencies.back();
     }
 

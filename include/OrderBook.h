@@ -26,7 +26,7 @@ class OrderBook {
     public:
         void addOrder(Order* ord);
         bool cancelOrder(int id);
-        std::vector<Trade> matchOrder(Order* ord);
+        void matchOrder(Order* ord, std::vector<Trade>& trades);
         double getBestBid() const;
         double getBestAsk() const;
 

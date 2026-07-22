@@ -126,38 +126,55 @@ bool OrderBook::cancelOrder(int id) {
     return true;
 }
 
-std::vector<Trade> OrderBook::matchOrder(Order* ord) {
-    std::vector<Trade> trades;
-
+void OrderBook::matchOrder(Order* ord, std::vector<Trade>& trades) {
     while (ord->getQuantity() > 0 && hasMatch(*ord)) {
+        Order* restingOrder = nullptr;
+        double executionPrice = 0.0;
+
         if (ord->getSide() == Side::Buy) {
-            auto priceIt = sellOrders.begin();
-            Order* resting = priceIt->second.front();
+            auto bestAskLevel = sellOrders.begin();
 
-            double matchedQ = std::min(ord->getQuantity(), resting->getQuantity());
-            ord->reduceQuantity(matchedQ);
-            resting->reduceQuantity(matchedQ);
-
-            trades.emplace_back(ord->getId(), resting->getId(), resting->getPrice(), matchedQ);
-            removeFilledOrders();
+            restingOrder = bestAskLevel->second.front();
+            executionPrice = restingOrder->getPrice();
         }
         else {
-            auto priceIt = std::prev(buyOrders.end());
-            Order* resting = priceIt->second.front();
+            auto bestBidLevel = std::prev(buyOrders.end());
 
-            double matchedQ = std::min(ord->getQuantity(), resting->getQuantity());
-            ord->reduceQuantity(matchedQ);
-            resting->reduceQuantity(matchedQ);
-
-            trades.emplace_back(resting->getId(), ord->getId(), resting->getPrice(), matchedQ);
-            removeFilledOrders();            
+            restingOrder = bestBidLevel->second.front();
+            executionPrice = restingOrder->getPrice();
         }
+
+        double matchedQuantity = std::min(
+            ord->getQuantity(),
+            restingOrder->getQuantity()
+        );
+
+        ord->reduceQuantity(matchedQuantity);
+        restingOrder->reduceQuantity(matchedQuantity);
+
+        if (ord->getSide() == Side::Buy) {
+            trades.emplace_back(
+                ord->getId(),
+                restingOrder->getId(),
+                executionPrice,
+                matchedQuantity
+            );
+        }
+        else {
+            trades.emplace_back(
+                restingOrder->getId(),
+                ord->getId(),
+                executionPrice,
+                matchedQuantity
+            );
+        }
+
+        removeFilledOrders();
     }
-    
+
     if (ord->getQuantity() > 0) {
         addOrder(ord);
     }
-    return trades;
 }
 
 double OrderBook::getBestBid() const {

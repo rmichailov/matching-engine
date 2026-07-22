@@ -149,7 +149,9 @@ void testNoMatch()
     book.addOrder(&restingSell);
 
     Order incomingBuy(2, Side::Buy, 100.00, 5.0, 2);
-    std::vector<Trade> trades = book.matchOrder(&incomingBuy);
+    std::vector<Trade> trades;
+
+    book.matchOrder(&incomingBuy, trades);
 
     assert(trades.empty());
     assert(approximatelyEqual(incomingBuy.getQuantity(), 5.0));
@@ -169,7 +171,9 @@ void testExactMatch()
     book.addOrder(&restingSell);
 
     Order incomingBuy(2, Side::Buy, 100.00, 10.0, 2);
-    std::vector<Trade> trades = book.matchOrder(&incomingBuy);
+    std::vector<Trade> trades;
+
+    book.matchOrder(&incomingBuy, trades);
 
     assert(trades.size() == 1);
 
@@ -198,7 +202,9 @@ void testIncomingBuyPartiallyFilled()
     book.addOrder(&restingSell);
 
     Order incomingBuy(2, Side::Buy, 100.00, 10.0, 2);
-    std::vector<Trade> trades = book.matchOrder(&incomingBuy);
+    std::vector<Trade> trades;
+
+    book.matchOrder(&incomingBuy, trades);
 
     assert(trades.size() == 1);
     assert(approximatelyEqual(trades[0].getQuantity(), 5.0));
@@ -223,7 +229,9 @@ void testRestingSellPartiallyFilled()
     book.addOrder(&restingSell);
 
     Order incomingBuy(2, Side::Buy, 101.00, 4.0, 2);
-    std::vector<Trade> trades = book.matchOrder(&incomingBuy);
+    std::vector<Trade> trades;
+
+    book.matchOrder(&incomingBuy, trades);
 
     assert(trades.size() == 1);
     assert(approximatelyEqual(trades[0].getQuantity(), 4.0));
@@ -247,7 +255,9 @@ void testIncomingSellMatch()
     book.addOrder(&restingBuy);
 
     Order incomingSell(2, Side::Sell, 99.00, 10.0, 2);
-    std::vector<Trade> trades = book.matchOrder(&incomingSell);
+    std::vector<Trade> trades;
+
+    book.matchOrder(&incomingSell, trades);
 
     assert(trades.size() == 1);
 
@@ -275,7 +285,9 @@ void testMultiplePriceLevelMatches()
     book.addOrder(&sell3);
 
     Order incomingBuy(4, Side::Buy, 101.00, 10.0, 4);
-    std::vector<Trade> trades = book.matchOrder(&incomingBuy);
+    std::vector<Trade> trades;
+
+    book.matchOrder(&incomingBuy, trades);
 
     assert(trades.size() == 2);
 
@@ -308,7 +320,9 @@ void testFifoAtSamePrice()
     book.addOrder(&sell2);
 
     Order incomingBuy(3, Side::Buy, 100.00, 7.0, 3);
-    std::vector<Trade> trades = book.matchOrder(&incomingBuy);
+    std::vector<Trade> trades;
+
+    book.matchOrder(&incomingBuy, trades);
 
     assert(trades.size() == 2);
 
@@ -336,7 +350,9 @@ void testExecutionUsesRestingPrice()
     book.addOrder(&restingSell);
 
     Order incomingBuy(2, Side::Buy, 110.00, 5.0, 2);
-    std::vector<Trade> trades = book.matchOrder(&incomingBuy);
+    std::vector<Trade> trades;
+
+    book.matchOrder(&incomingBuy, trades);
 
     assert(trades.size() == 1);
 
