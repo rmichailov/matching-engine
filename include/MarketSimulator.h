@@ -11,8 +11,15 @@ struct SimulationResults
 {
     std::size_t ordersProcessed;
     std::size_t tradesExecuted;
+
     double runtimeSeconds;
     double ordersPerSecond;
+
+    double averageLatencyMicroseconds;
+    double medianLatencyMicroseconds;
+    double p95LatencyMicroseconds;
+    double p99LatencyMicroseconds;
+    double maximumLatencyMicroseconds;
 };
 
 class MarketSimulator
@@ -34,9 +41,14 @@ class MarketSimulator
 
         Order* generateRandomOrder();
 
+        double calculatePercentile(std::vector<double>& latencies, double percentile);
+
     public:
         MarketSimulator(unsigned int seed, double basePrice, double priceRange, double minimumQuantity, double maximumQuantity);
-        
-        SimulationResults run(std::size_t numberOfOrders);
+
+        void generateOrders(std::size_t numberOfOrders);
+
+        SimulationResults runBenchmark();
+
         const MatchingEngine& getEngine() const;
 };
