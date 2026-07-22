@@ -69,8 +69,11 @@ void MarketSimulator::generateRandomOrder() {
     nextOrderId++;
     nextTimestamp++;
 }
+
 void MarketSimulator::generateOrders(std::size_t numberOfOrders) {
     orders.reserve(orders.size() + numberOfOrders);
+
+    engine.reserve(numberOfOrders);
 
     for (std::size_t i = 0; i < numberOfOrders; i++) {
         generateRandomOrder();

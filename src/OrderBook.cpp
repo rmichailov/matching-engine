@@ -58,6 +58,11 @@ bool OrderBook::isEmpty() const {
     return orderLookup.size() == 0;
 }
 
+void OrderBook::reserve(std::size_t capacity) {
+    orderLookup.max_load_factor(0.7f);
+    orderLookup.reserve(capacity);
+}
+
 void OrderBook::addOrder(Order* ord) {
     orderLookup[ord->getId()] = ord;
 

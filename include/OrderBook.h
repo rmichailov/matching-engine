@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <map>
 #include <queue>
+#include <cstddef>
 
 class OrderBook {
     private:
@@ -24,6 +25,7 @@ class OrderBook {
         bool isEmpty() const;
 
     public:
+        void reserve(std::size_t capacity);
         void addOrder(Order* ord);
         bool cancelOrder(int id);
         void matchOrder(Order* ord, std::vector<Trade>& trades);
