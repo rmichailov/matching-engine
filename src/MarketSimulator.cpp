@@ -96,7 +96,48 @@ double MarketSimulator::calculatePercentile(std::vector<double>& latencies, doub
     return latencies[index];
 }
 
-SimulationResults MarketSimulator::runBenchmark() {
+SimulationResults MarketSimulator::runThroughputBenchmark() {
+    std::size_t tradeCount = 0;
+
+    auto benchmarkStart = std::chrono::steady_clock::now();
+
+    for (const std::unique_ptr<Order>& order : orders)
+    {
+        std::vector<Trade> trades = engine.submitOrder(order.get());
+
+        tradeCount += trades.size();
+    }
+
+    auto benchmarkEnd = std::chrono::steady_clock::now();
+
+    std::chrono::duration<double> totalDuration =
+        benchmarkEnd - benchmarkStart;
+
+    double runtimeSeconds = totalDuration.count();
+
+    double ordersPerSecond = 0.0;
+
+    if (runtimeSeconds > 0.0)
+    {
+        ordersPerSecond =
+            static_cast<double>(orders.size()) / runtimeSeconds;
+    }
+
+    return SimulationResults{
+        orders.size(),
+        tradeCount,
+        runtimeSeconds,
+        ordersPerSecond,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+    };
+}
+
+SimulationResults MarketSimulator::runLatencyBenchmark()
+{
     std::size_t tradeCount = 0;
 
     std::vector<double> latencies;
@@ -104,8 +145,10 @@ SimulationResults MarketSimulator::runBenchmark() {
 
     auto benchmarkStart = std::chrono::steady_clock::now();
 
-    for (const std::unique_ptr<Order>& order : orders) {
+    for (const std::unique_ptr<Order>& order : orders)
+    {
         auto orderStart = std::chrono::steady_clock::now();
+
         std::vector<Trade> trades = engine.submitOrder(order.get());
 
         auto orderEnd = std::chrono::steady_clock::now();
@@ -127,7 +170,8 @@ SimulationResults MarketSimulator::runBenchmark() {
 
     double ordersPerSecond = 0.0;
 
-    if (runtimeSeconds > 0.0) {
+    if (runtimeSeconds > 0.0)
+    {
         ordersPerSecond =
             static_cast<double>(orders.size()) / runtimeSeconds;
     }
@@ -140,20 +184,27 @@ SimulationResults MarketSimulator::runBenchmark() {
 
     double averageLatency = 0.0;
 
-    if (!latencies.empty()) {
+    if (!latencies.empty())
+    {
         averageLatency =
             totalLatency / static_cast<double>(latencies.size());
     }
 
     std::sort(latencies.begin(), latencies.end());
 
-    double medianLatency = calculatePercentile(latencies, 0.50);
-    double p95Latency = calculatePercentile(latencies, 0.95);
-    double p99Latency = calculatePercentile(latencies, 0.99);
+    double medianLatency =
+        calculatePercentile(latencies, 0.50);
+
+    double p95Latency =
+        calculatePercentile(latencies, 0.95);
+
+    double p99Latency =
+        calculatePercentile(latencies, 0.99);
 
     double maximumLatency = 0.0;
 
-    if (!latencies.empty()) {
+    if (!latencies.empty())
+    {
         maximumLatency = latencies.back();
     }
 

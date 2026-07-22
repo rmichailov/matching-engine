@@ -7,7 +7,7 @@ int main()
 {
     const std::size_t numberOfOrders = 1'000'000;
 
-    MarketSimulator simulator(
+    MarketSimulator throughputSimulator(
         42,
         100.00,
         2.00,
@@ -15,54 +15,78 @@ int main()
         100.00
     );
 
-    std::cout << "Generating orders...\n";
+    std::cout << "Generating throughput orders...\n";
 
-    simulator.generateOrders(numberOfOrders);
+    throughputSimulator.generateOrders(numberOfOrders);
 
-    std::cout << "Running benchmark...\n";
+    std::cout << "Running throughput benchmark...\n";
 
-    SimulationResults results = simulator.runBenchmark();
+    SimulationResults throughputResults =
+        throughputSimulator.runThroughputBenchmark();
+
+    MarketSimulator latencySimulator(
+        42,
+        100.00,
+        2.00,
+        1.00,
+        100.00
+    );
+
+    std::cout << "Generating latency orders...\n";
+
+    latencySimulator.generateOrders(numberOfOrders);
+
+    std::cout << "Running latency benchmark...\n";
+
+    SimulationResults latencyResults =
+        latencySimulator.runLatencyBenchmark();
 
     std::cout << std::fixed << std::setprecision(3);
 
-    std::cout << "\nBenchmark Results\n";
-    std::cout << "-----------------\n";
+    std::cout << "\nThroughput Results\n";
+    std::cout << "------------------\n";
 
     std::cout << "Orders processed: "
-              << results.ordersProcessed << '\n';
+              << throughputResults.ordersProcessed << '\n';
 
     std::cout << "Trades executed:  "
-              << results.tradesExecuted << '\n';
+              << throughputResults.tradesExecuted << '\n';
 
     std::cout << "Runtime:          "
-              << results.runtimeSeconds
+              << throughputResults.runtimeSeconds
               << " seconds\n";
 
     std::cout << "Throughput:       "
-              << results.ordersPerSecond
+              << throughputResults.ordersPerSecond
               << " orders/second\n";
 
-    std::cout << "\nLatency\n";
-    std::cout << "-------\n";
+    std::cout << "\nLatency Results\n";
+    std::cout << "---------------\n";
+
+    std::cout << "Orders processed: "
+              << latencyResults.ordersProcessed << '\n';
+
+    std::cout << "Trades executed:  "
+              << latencyResults.tradesExecuted << '\n';
 
     std::cout << "Average: "
-              << results.averageLatencyMicroseconds
+              << latencyResults.averageLatencyMicroseconds
               << " microseconds\n";
 
     std::cout << "Median:  "
-              << results.medianLatencyMicroseconds
+              << latencyResults.medianLatencyMicroseconds
               << " microseconds\n";
 
     std::cout << "P95:     "
-              << results.p95LatencyMicroseconds
+              << latencyResults.p95LatencyMicroseconds
               << " microseconds\n";
 
     std::cout << "P99:     "
-              << results.p99LatencyMicroseconds
+              << latencyResults.p99LatencyMicroseconds
               << " microseconds\n";
 
     std::cout << "Maximum: "
-              << results.maximumLatencyMicroseconds
+              << latencyResults.maximumLatencyMicroseconds
               << " microseconds\n";
 
     return 0;
