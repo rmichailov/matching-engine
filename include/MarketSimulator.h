@@ -47,7 +47,8 @@ class MarketSimulator {
 
         void generateOrders(std::size_t numberOfOrders);
 
-        SimulationResults runBenchmark();
+        SimulationResults runThroughputBenchmark();
+        SimulationResults runLatencyBenchmark();
 
         const MatchingEngine& getEngine() const;
 };
