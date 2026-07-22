@@ -1,10 +1,13 @@
 #include "MarketSimulator.h"
 
+#include <algorithm>
 #include <chrono>
+#include <numeric>
 #include <stdexcept>
 
 MarketSimulator::MarketSimulator(unsigned int seed, double basePrice, double priceRange, double minimumQuantity, double maximumQuantity) {
     randomGenerator = std::mt19937(seed);
+
     nextOrderId = 1;
     nextTimestamp = 1;
 
@@ -16,18 +19,19 @@ MarketSimulator::MarketSimulator(unsigned int seed, double basePrice, double pri
     if (basePrice <= 0.0) {
         throw std::invalid_argument("Base price must be positive.");
     }
+
     if (priceRange < 0.0) {
         throw std::invalid_argument("Price range cannot be negative.");
     }
+
     if (minimumQuantity <= 0.0) {
         throw std::invalid_argument("Minimum quantity must be positive.");
     }
+
     if (maximumQuantity < minimumQuantity) {
-        throw std::invalid_argument(
-            "Maximum quantity must be at least the minimum quantity.");
+        throw std::invalid_argument("Maximum quantity must be at least the minimum quantity.");
     }
 }
-
 
 Order* MarketSimulator::generateRandomOrder() {
     std::bernoulli_distribution sideDistribution(0.5);
@@ -42,12 +46,19 @@ Order* MarketSimulator::generateRandomOrder() {
         maximumQuantity
     );
 
-    Side side = sideDistribution(randomGenerator) ? Side::Buy : Side::Sell;
+    Side side;
+
+    if (sideDistribution(randomGenerator)) {
+        side = Side::Buy;
+    }
+    else {
+        side = Side::Sell;
+    }
 
     double price = priceDistribution(randomGenerator);
     double quantity = quantityDistribution(randomGenerator);
 
-    auto order = std::make_unique<Order>(
+    std::unique_ptr<Order> order = std::make_unique<Order>(
         nextOrderId,
         side,
         price,
@@ -55,8 +66,8 @@ Order* MarketSimulator::generateRandomOrder() {
         nextTimestamp
     );
 
-    ++nextOrderId;
-    ++nextTimestamp;
+    nextOrderId++;
+    nextTimestamp++;
 
     Order* orderPointer = order.get();
 
@@ -65,37 +76,97 @@ Order* MarketSimulator::generateRandomOrder() {
     return orderPointer;
 }
 
-
-SimulationResults MarketSimulator::run(std::size_t numberOfOrders)
-{
-    std::size_t tradeCount = 0;
-
+void MarketSimulator::generateOrders(std::size_t numberOfOrders) {
     orders.reserve(orders.size() + numberOfOrders);
 
-    auto startTime = std::chrono::steady_clock::now();
-
     for (std::size_t i = 0; i < numberOfOrders; i++) {
-        Order* order = generateRandomOrder();
-        std::vector<Trade> trades = engine.submitOrder(order);
-        tradeCount += trades.size();
+        generateRandomOrder();
+    }
+}
+
+double MarketSimulator::calculatePercentile(std::vector<double>& latencies, double percentile) {
+    if (latencies.empty()) {
+        return 0.0;
     }
 
-    auto endTime = std::chrono::steady_clock::now();
+    std::size_t index = static_cast<std::size_t>(
+        percentile * static_cast<double>(latencies.size() - 1)
+    );
 
-    std::chrono::duration<double> elapsedTime = endTime - startTime;
+    return latencies[index];
+}
 
-    double runtimeSeconds = elapsedTime.count();
+SimulationResults MarketSimulator::runBenchmark() {
+    std::size_t tradeCount = 0;
 
-    double ordersPerSecond =
-        runtimeSeconds > 0.0
-            ? static_cast<double>(numberOfOrders) / runtimeSeconds
-            : 0.0;
+    std::vector<double> latencies;
+    latencies.reserve(orders.size());
+
+    auto benchmarkStart = std::chrono::steady_clock::now();
+
+    for (const std::unique_ptr<Order>& order : orders) {
+        auto orderStart = std::chrono::steady_clock::now();
+        std::vector<Trade> trades = engine.submitOrder(order.get());
+
+        auto orderEnd = std::chrono::steady_clock::now();
+
+        tradeCount += trades.size();
+
+        std::chrono::duration<double, std::micro> orderDuration =
+            orderEnd - orderStart;
+
+        latencies.push_back(orderDuration.count());
+    }
+
+    auto benchmarkEnd = std::chrono::steady_clock::now();
+
+    std::chrono::duration<double> totalDuration =
+        benchmarkEnd - benchmarkStart;
+
+    double runtimeSeconds = totalDuration.count();
+
+    double ordersPerSecond = 0.0;
+
+    if (runtimeSeconds > 0.0) {
+        ordersPerSecond =
+            static_cast<double>(orders.size()) / runtimeSeconds;
+    }
+
+    double totalLatency = std::accumulate(
+        latencies.begin(),
+        latencies.end(),
+        0.0
+    );
+
+    double averageLatency = 0.0;
+
+    if (!latencies.empty()) {
+        averageLatency =
+            totalLatency / static_cast<double>(latencies.size());
+    }
+
+    std::sort(latencies.begin(), latencies.end());
+
+    double medianLatency = calculatePercentile(latencies, 0.50);
+    double p95Latency = calculatePercentile(latencies, 0.95);
+    double p99Latency = calculatePercentile(latencies, 0.99);
+
+    double maximumLatency = 0.0;
+
+    if (!latencies.empty()) {
+        maximumLatency = latencies.back();
+    }
 
     return SimulationResults{
-        numberOfOrders,
+        orders.size(),
         tradeCount,
         runtimeSeconds,
-        ordersPerSecond
+        ordersPerSecond,
+        averageLatency,
+        medianLatency,
+        p95Latency,
+        p99Latency,
+        maximumLatency
     };
 }
 

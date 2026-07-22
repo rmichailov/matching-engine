@@ -22,8 +22,7 @@ struct SimulationResults
     double maximumLatencyMicroseconds;
 };
 
-class MarketSimulator
-{
+class MarketSimulator {
     private:
         MatchingEngine engine;
 
