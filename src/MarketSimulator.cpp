@@ -33,7 +33,7 @@ MarketSimulator::MarketSimulator(unsigned int seed, double basePrice, double pri
     }
 }
 
-Order* MarketSimulator::generateRandomOrder() {
+void MarketSimulator::generateRandomOrder() {
     std::bernoulli_distribution sideDistribution(0.5);
 
     std::uniform_real_distribution<double> priceDistribution(
@@ -58,7 +58,7 @@ Order* MarketSimulator::generateRandomOrder() {
     double price = priceDistribution(randomGenerator);
     double quantity = quantityDistribution(randomGenerator);
 
-    std::unique_ptr<Order> order = std::make_unique<Order>(
+    orders.emplace_back(
         nextOrderId,
         side,
         price,
@@ -68,14 +68,7 @@ Order* MarketSimulator::generateRandomOrder() {
 
     nextOrderId++;
     nextTimestamp++;
-
-    Order* orderPointer = order.get();
-
-    orders.push_back(std::move(order));
-
-    return orderPointer;
 }
-
 void MarketSimulator::generateOrders(std::size_t numberOfOrders) {
     orders.reserve(orders.size() + numberOfOrders);
 
@@ -104,10 +97,10 @@ SimulationResults MarketSimulator::runThroughputBenchmark() {
 
     auto benchmarkStart = std::chrono::steady_clock::now();
 
-    for (const std::unique_ptr<Order>& order : orders) {
+    for (Order& order : orders) {
         trades.clear();
 
-        engine.submitOrder(order.get(), trades);
+        engine.submitOrder(&order, trades);
 
         tradeCount += trades.size();
     }
@@ -150,12 +143,12 @@ SimulationResults MarketSimulator::runLatencyBenchmark() {
 
     auto benchmarkStart = std::chrono::steady_clock::now();
 
-    for (const std::unique_ptr<Order>& order : orders) {
+    for (Order& order : orders) {
         trades.clear();
 
         auto orderStart = std::chrono::steady_clock::now();
 
-        engine.submitOrder(order.get(), trades);
+        engine.submitOrder(&order, trades);
 
         auto orderEnd = std::chrono::steady_clock::now();
 

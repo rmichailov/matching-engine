@@ -26,7 +26,7 @@ class MarketSimulator {
     private:
         MatchingEngine engine;
 
-        std::vector<std::unique_ptr<Order>> orders;
+        std::vector<Order> orders;
 
         std::mt19937 randomGenerator;
 
@@ -38,7 +38,7 @@ class MarketSimulator {
         double minimumQuantity;
         double maximumQuantity;
 
-        Order* generateRandomOrder();
+        void generateRandomOrder();
 
         double calculatePercentile(std::vector<double>& latencies, double percentile);
 
